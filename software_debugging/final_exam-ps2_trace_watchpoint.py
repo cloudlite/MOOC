@@ -1,9 +1,8 @@
-#!/usr/bin/env python
+# !/usr/bin/env python
 # Simple debugger
-# See instructions around line 34
+# See instructions around line 85
 import sys
 import readline
-
 
 # Our buggy program
 def remove_html_markup(s):
@@ -25,48 +24,24 @@ def remove_html_markup(s):
 
 # main program that runs the buggy program
 def main():
-    print remove_html_markup('xyz')
     print remove_html_markup('"<b>foo</b>"')
+    print remove_html_markup('xyz')
     print remove_html_markup("'<b>foo</b>'")
 
 # globals
-breakpoints = {10: True}
-stepping = False
-watchpoints = {}
+breakpoints = {}
+watchpoints = {"quote": True}
+watch_values = {}
+stepping = True
 
-""" *** INSTRUCTIONS ***
-Improve and expand this function to accept 
-a print command 'p <arg>'.
-If the print command has no argument,
-print out the dictionary that holds all variables.
-Print the value of the supplied variable
-in a form 'var = repr(value)', if
-the 'p' is followed by an argument,
-or print 'No such variable:', arg
-if no such variable exists.
-"""
 """
 Our debug function
-Improve and expand this function to accept
-a breakpoint command 'b <line>'.
-Add the line number to the breakpoints dictionary
-or print 'You must supply a line number'
-if 'b' is not followed by a line number.
-"""
-"""
-Our debug function
-Improve and expand the debug function to accept
-a watchpoint command 'w <var name>'.
-Add the variable name to the watchpoints dictionary
-or print 'You must supply a variable name'
-if 'w' is not followed by a string.
 """
 
 
 def debug(command, my_locals):
     global stepping
     global breakpoints
-    global watchpoints
 
     if command.find(' ') > 0:
         arg = command.split(' ')[1]
@@ -94,11 +69,22 @@ def debug(command, my_locals):
         else:
             print 'You must supply a line number'
     elif command.startswith('w'):  # watch variable
-        if arg:
-            watchpoints[arg] = True
+        # YOUR CODE HERE
+        global watch_values, watchpoints
+        if arg and my_locals.has_key(arg):
+            for key in watchpoints.iterkeys():
+                if not watch_values.has_key(key):
+                    watch_values[key] = [my_locals[key]]
+                    print key, ":", "Initialized", "=>", repr(watch_values[key][-1])
+                else:
+                    if my_locals[key] != watch_values[key][-1]:
+                        watch_values[key].append(my_locals[key])
+                        print key, ":", repr(watch_values[key][-2]), "=>".repr(watch_values[key][-1])
         else:
             print 'You must supply a variable name'
+
     elif command.startswith('q'):  # quit
+        print "Exiting my-spyder..."
         sys.exit(0)
     else:
         print "No such command", repr(command)
@@ -106,8 +92,7 @@ def debug(command, my_locals):
     return False
 
 
-# commands = ["p", "s", "p tag", "p foo", "q"]
-commands = ["b 5", "c", "c", "q"]
+commands = ["w c", "c", "c", "w out", "c", "c", "c", "q"]
 
 
 def input_command():
@@ -115,6 +100,20 @@ def input_command():
     global commands
     command = commands.pop(0)
     return command
+
+
+"""
+Our traceit function
+Improve the traceit function to watch for variables in the watchpoint
+dictionary and print out (literally like that):
+event, frame.f_lineno, frame.f_code.co_name
+and then the values of the variables, each in new line, in a format:
+somevar ":", "Initialized"), "=>", repr(somevalue)
+if the value was not set, and got set in the line, or
+somevar ":", repr(old-value), "=>", repr(new-value)
+when the value of the variable has changed.
+If the value is unchanged, do not print anything.
+"""
 
 
 def traceit(frame, event, trace_arg):
@@ -133,7 +132,18 @@ def traceit(frame, event, trace_arg):
 sys.settrace(traceit)
 main()
 sys.settrace(None)
-#
-# print breakpoints
-# debug("b 5", {'quote': False, 's': 'xyz', 'tag': False, 'c': 'b', 'out': ''})
-# print breakpoints == {10: True, 5: True}
+
+# with the commands = ["w c", "c", "c", "w out", "c", "c", "c", "q"],
+# the output should look like this (line numbers may be different):
+# line 26 main {}
+# line 10 remove_html_markup
+# quote : Initialized => False
+# line 13 remove_html_markup
+# c : Initialized => '"'
+# line 19 remove_html_markup
+# quote : False => True
+# line 13 remove_html_markup
+# c : '"' => '<'
+# line 21 remove_html_markup
+# out : '' => '<'
+# Exiting my-spyder...

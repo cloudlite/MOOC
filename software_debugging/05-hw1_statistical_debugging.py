@@ -111,13 +111,7 @@ def traceit(frame, event, arg):
     global coverage
     global mode
 
-    # if event == "return":
-    # print arg
-
-    # if event == "line":
-
     ok_to_add = False
-    #if event == "return" and ((isinstance(arg, str) == False and arg < 0) or (isinstance(arg, str) == True and arg == "FAIL")):
 
     if mode == -1:
         if event == "return" and isinstance(arg, str) == False and arg < 0:
@@ -132,10 +126,7 @@ def traceit(frame, event, arg):
             ok_to_add = True
 
     if ok_to_add == True:
-        #print arg
         filename = frame.f_code.co_filename
-        #print dir(frame)
-        #print frame.f_code.co_name
         lineno = frame.f_lineno
         if not coverage.has_key(filename):
             coverage[filename] = {}
@@ -271,7 +262,7 @@ def compute_n(tables):
 # inputs_line = ['foo',
 # '<b>foo</b>',
 # '"<b>foo</b>"',
-#          '"foo"', 
+# '"foo"',
 #          "'foo'", 
 #          '<em>foo</em>', 
 #          '<a href="foo">foo</a>',
