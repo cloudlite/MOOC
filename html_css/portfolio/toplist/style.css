@@ -1,0 +1,37 @@
+* {
+    /*outline: 1px solid red;*/
+}
+
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.title {
+    background-color: #33bebe;
+    font-size: 50px;
+    color: white;
+}
+
+.app {
+    display: flex;
+}
+
+.image {
+    max-width: 460px;
+    max-height: 460px;
+}
+
+#img1 {
+    max-width: 80%;
+}
+
+.description {
+    margin-left: auto;
+    max-width: 705px;
+    font-style: normal;
+    font-size: x-large;
+    color: #7C8B88;
+}
